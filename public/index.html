@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Auth</title>
+</head>
+<body>
+    <button id="login-btn">Login with Google</button>
+    <p id="user-info"></p>
+
+    <script type="module">
+        import { auth, provider, signInWithPopup } from '../src/firebase-config.js';
+
+        document.getElementById("login-btn").addEventListener("click", async () => {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                document.getElementById("user-info").innerText = `Hello, ${user.displayName}`;
+            } catch (error) {
+                console.error("Login Failed:", error);
+            }
+        });
+    </script>
+</body>
+</html>

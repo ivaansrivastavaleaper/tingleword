@@ -1,1 +1,26 @@
-vercel.json
+# Ignore environment files
+.env.local
+
+# Ignore dependencies
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Ignore build files
+.next/
+out/
+dist/
+build/
+
+# Ignore Firebase Emulators (if used)
+firebase-debug.log
+firestore-debug.log
+
+# Ignore Vercel build output (if using Vercel)
+.vercel/
+
+# Ignore logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
