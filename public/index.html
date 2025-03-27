@@ -81,30 +81,6 @@
             display: block;
             margin: 5px;
         }
-
-        /* Popups */
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--container-bg);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            z-index: 100;
-        }
-
-        .popup button {
-            margin: 10px;
-        }
-
-        /* Dark Mode Toggle */
-        #dark-mode-toggle {
-            background: #666;
-        }
     </style>
 </head>
 <body>
@@ -123,20 +99,6 @@
         <p id="status-text">Not logged in. Click "Account" to log in.</p>
     </div>
 
-    <!-- Login Popup -->
-    <div id="login-popup" class="popup">
-        <p>Sign in with Google?</p>
-        <button id="confirm-login">Yes</button>
-        <button id="cancel-login">Cancel</button>
-    </div>
-
-    <!-- Delete Confirmation Popup -->
-    <div id="delete-popup" class="popup">
-        <p>Are you sure you want to delete your account?</p>
-        <button id="confirm-delete">Yes, Delete</button>
-        <button id="cancel-delete">Cancel</button>
-    </div>
-
     <script type="module">
         import { auth, provider, signInWithPopup, signOut, deleteUser, reauthenticateWithPopup } from '/firebase-config.js';
 
@@ -148,15 +110,6 @@
         const statusText = document.getElementById("status-text");
         const darkModeToggle = document.getElementById("dark-mode-toggle");
 
-        // Popups
-        const loginPopup = document.getElementById("login-popup");
-        const deletePopup = document.getElementById("delete-popup");
-
-        const confirmLogin = document.getElementById("confirm-login");
-        const cancelLogin = document.getElementById("cancel-login");
-        const confirmDelete = document.getElementById("confirm-delete");
-        const cancelDelete = document.getElementById("cancel-delete");
-
         // Toggle Account Menu
         accountBtn.addEventListener("click", (event) => {
             event.stopPropagation();
@@ -164,79 +117,3 @@
         });
 
         document.addEventListener("click", (event) => {
-            if (!accountMenu.contains(event.target) && event.target !== accountBtn) {
-                accountMenu.style.display = "none";
-            }
-        });
-
-        // Open Login Popup
-        loginBtn.addEventListener("click", () => {
-            loginPopup.style.display = "block";
-        });
-
-        cancelLogin.addEventListener("click", () => {
-            loginPopup.style.display = "none";
-        });
-
-        confirmLogin.addEventListener("click", async () => {
-            try {
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                statusText.innerText = `You're logged in as ${user.displayName}`;
-                loginBtn.style.display = "none";
-                logoutBtn.style.display = "block";
-                deleteAccountBtn.style.display = "block";
-                loginPopup.style.display = "none";
-            } catch (error) {
-                console.error("Login Failed:", error);
-            }
-        });
-
-        // Logout
-        logoutBtn.addEventListener("click", () => {
-            signOut(auth).then(() => {
-                statusText.innerText = "Not logged in. Click 'Account' to log in.";
-                loginBtn.style.display = "block";
-                logoutBtn.style.display = "none";
-                deleteAccountBtn.style.display = "none";
-            });
-        });
-
-        // Open Delete Account Popup
-        deleteAccountBtn.addEventListener("click", () => {
-            deletePopup.style.display = "block";
-        });
-
-        cancelDelete.addEventListener("click", () => {
-            deletePopup.style.display = "none";
-        });
-
-        confirmDelete.addEventListener("click", async () => {
-            const user = auth.currentUser;
-            if (!user) return;
-
-            try {
-                await reauthenticateWithPopup(user, provider);
-                await deleteUser(user);
-                alert("Your account has been deleted.");
-                location.reload();
-            } catch (error) {
-                console.error("Error deleting account:", error);
-                alert("Account deletion failed. Please log in again before deleting.");
-            }
-        });
-
-        // Dark Mode Toggle
-        darkModeToggle.addEventListener("click", () => {
-            document.body.classList.toggle("dark-mode");
-            localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
-        });
-
-        // Load Dark Mode Preference
-        if (localStorage.getItem("darkMode") === "true") {
-            document.body.classList.add("dark-mode");
-        }
-    </script>
-
-</body>
-</html>
