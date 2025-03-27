@@ -1,46 +1,25 @@
-// Import Firebase modules from CDN
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+// Import Firebase modules
+import { initializeApp } from "firebase/app";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAnalytics } from "firebase/analytics";
 
-// Firebase configuration
+// Firebase configuration (New Project)
 const firebaseConfig = {
-  apiKey: "AIzaSyAoyrMwrhbVRYO1DbvzdPZ1r_24J6ZmR2s",
-  authDomain: "tingleword.firebaseapp.com",
-  projectId: "tingleword",
-  storageBucket: "tingleword.firebasestorage.app",
-  messagingSenderId: "61299705070",
-  appId: "1:61299705070:web:8df158d56514b65fcedfff",
-  measurementId: "G-2HRBW93Q68"
+  apiKey: "AIzaSyDoxcUcW3oVcQFAWvhmWh_pTuugr9rF0DQ",
+  authDomain: "leaperstuff.firebaseapp.com",
+  databaseURL: "https://leaperstuff-default-rtdb.firebaseio.com",
+  projectId: "leaperstuff",
+  storageBucket: "leaperstuff.appspot.com",  // Corrected domain
+  messagingSenderId: "924724287800",
+  appId: "1:924724287800:web:7c7fcd60a69ae13541c9cd",
+  measurementId: "G-1H7328L9VF"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
+const analytics = getAnalytics(app);
 
-// Google Sign-in Function
-export function googleSignIn() {
-  signInWithPopup(auth, provider)
-    .then((result) => {
-      console.log("User signed in:", result.user);
-      alert(`Welcome, ${result.user.displayName}`);
-    })
-    .catch((error) => {
-      console.error("Sign-in error:", error);
-    });
-}
-
-// Google Sign-out Function
-export function googleSignOut() {
-  signOut(auth)
-    .then(() => {
-      console.log("User signed out");
-      alert("You have signed out.");
-    })
-    .catch((error) => {
-      console.error("Sign-out error:", error);
-    });
-}
-
-// Export Auth and Provider
-export { auth, provider };
+// Export Firebase modules
+export { app, auth, provider, analytics };
