@@ -55,17 +55,14 @@
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
+        #account-menu button {
+            display: block;
+            margin: 5px;
+        }
         #note-manager, #onboarding {
             display: none;
             text-align: left;
             margin-top: 15px;
-        }
-        textarea {
-            width: 100%;
-            height: 100px;
-            margin-top: 10px;
-            padding: 5px;
-            font-size: 14px;
         }
         #confirm-popup {
             display: none;
@@ -103,13 +100,6 @@
         <p id="welcome-text">Please log in to manage your notes.</p>
         <p id="user-info"></p>
 
-        <div id="onboarding">
-            <h2>Setup Your Account</h2>
-            <p>What do you want to use TingleWord for?</p>
-            <input type="text" id="user-purpose" placeholder="e.g. Task management, Notes">
-            <button id="complete-onboarding">Save</button>
-        </div>
-
         <div id="note-manager">
             <h2>Note Manager</h2>
             <textarea placeholder="Write your notes here..."></textarea>
@@ -127,17 +117,27 @@
     <script type="module">
         import { auth, provider, signInWithPopup, signOut, deleteUser, reauthenticateWithPopup } from '/firebase-config.js';
 
+        const accountBtn = document.getElementById("account-btn");
+        const accountMenu = document.getElementById("account-menu");
         const loginBtn = document.getElementById("login-btn");
         const logoutBtn = document.getElementById("logout-btn");
         const deleteAccountBtn = document.getElementById("delete-account-btn");
-        const accountBtn = document.getElementById("account-btn");
-        const accountMenu = document.getElementById("account-menu");
         const confirmPopup = document.getElementById("confirm-popup");
 
-        accountBtn.addEventListener("click", () => {
-            accountMenu.style.display = accountMenu.style.display === "block" ? "none" : "block";
+        // Toggle Account Menu
+        accountBtn.addEventListener("click", (event) => {
+            event.stopPropagation(); // Prevents click from closing the menu immediately
+            accountMenu.style.display = (accountMenu.style.display === "block") ? "none" : "block";
         });
 
+        // Close menu when clicking outside
+        document.addEventListener("click", (event) => {
+            if (!accountMenu.contains(event.target) && event.target !== accountBtn) {
+                accountMenu.style.display = "none";
+            }
+        });
+
+        // Login with Google
         loginBtn.addEventListener("click", async () => {
             try {
                 const result = await signInWithPopup(auth, provider);
@@ -149,13 +149,13 @@
                 deleteAccountBtn.style.display = "block";
                 document.getElementById("welcome-text").style.display = "none";
 
-                const userEmail = user.email;
-                checkUserExists(userEmail);
+                checkUserExists(user.email);
             } catch (error) {
                 console.error("Login Failed:", error);
             }
         });
 
+        // Logout
         logoutBtn.addEventListener("click", () => {
             signOut(auth).then(() => {
                 document.getElementById("user-info").innerText = "";
@@ -164,10 +164,10 @@
                 deleteAccountBtn.style.display = "none";
                 document.getElementById("welcome-text").style.display = "block";
                 document.getElementById("note-manager").style.display = "none";
-                document.getElementById("onboarding").style.display = "none";
             });
         });
 
+        // Delete Account
         deleteAccountBtn.addEventListener("click", () => {
             confirmPopup.style.display = "block";
         });
@@ -184,7 +184,6 @@
                 await reauthenticateWithPopup(user, provider);
                 await deleteUser(user);
                 alert("Your account has been deleted.");
-                localStorage.removeItem("users");
                 location.reload();
             } catch (error) {
                 console.error("Error deleting account:", error);
@@ -198,15 +197,8 @@
             if (existingUsers[email]) {
                 document.getElementById("note-manager").style.display = "block";
             } else {
-                document.getElementById("onboarding").style.display = "block";
-                document.getElementById("complete-onboarding").addEventListener("click", () => {
-                    existingUsers[email] = {
-                        purpose: document.getElementById("user-purpose").value
-                    };
-                    localStorage.setItem("users", JSON.stringify(existingUsers));
-                    document.getElementById("onboarding").style.display = "none";
-                    document.getElementById("note-manager").style.display = "block";
-                });
+                localStorage.setItem("users", JSON.stringify({ ...existingUsers, [email]: true }));
+                document.getElementById("note-manager").style.display = "block";
             }
         }
     </script>
