@@ -26,11 +26,14 @@
     </div>
 
     <script type="module">
+        console.log("Firebase API Key:", import.meta.env.VITE_FIREBASE_API_KEY);
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
 
+        // Fetch Firebase API Key from Vercel environment variables
         const firebaseConfig = {
-            apiKey: import.meta.env.VITE_FIREBASE_API_KEY,  // Load from .env.local
+            apiKey: import.meta.env.VITE_FIREBASE_API_KEY,  // Auto-loaded from Vercel
             authDomain: "tingleword.firebaseapp.com",
             projectId: "tingleword",
             storageBucket: "tingleword.appspot.com",
