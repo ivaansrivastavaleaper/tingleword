@@ -36,7 +36,7 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
    // Fetch API key from the global script variable
 const firebaseConfig = {
-    apiKey: window.firebaseConfig.apiKey,  // ✅ Correct way to access it
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY, 
     authDomain: "tingleword.firebaseapp.com",
     projectId: "tingleword",
     storageBucket: "tingleword.appspot.com",
