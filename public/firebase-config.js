@@ -1,4 +1,4 @@
-// Import Firebase modules from CDN (for browser)
+// Import Firebase modules from CDN
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
@@ -41,3 +41,6 @@ export function googleSignOut() {
       console.error("Sign-out error:", error);
     });
 }
+
+// Export Auth and Provider
+export { auth, provider };

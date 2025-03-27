@@ -6,10 +6,16 @@
     <title>Google Auth</title>
 </head>
 <body>
-    <script type="module" src="/firebase-config.js"></script>
-
-<button id="login-btn" onclick="googleSignIn()">Login with Google</button>
-<button id="logout-btn" onclick="googleSignOut()">Logout</button>
+    <script type="module">
+        import { googleSignIn, googleSignOut } from "/firebase-config.js";
+      
+        document.getElementById("login-btn").addEventListener("click", googleSignIn);
+        document.getElementById("logout-btn").addEventListener("click", googleSignOut);
+      </script>
+      
+      <button id="login-btn">Login with Google</button>
+      <button id="logout-btn">Logout</button>
+      
 
     <p id="user-info"></p>
 
