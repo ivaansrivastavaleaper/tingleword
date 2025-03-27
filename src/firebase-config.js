@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-// Firebase configuration (DO NOT expose API keys publicly)
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAoyrMwrhbVRYO1DbvzdPZ1r_24J6ZmR2s",
   authDomain: "tingleword.firebaseapp.com",
