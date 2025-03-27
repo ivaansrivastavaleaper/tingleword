@@ -28,17 +28,17 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
-    
-        // Instead of process.env, fetch from a Vercel environment variable
-        const firebaseConfig = {
-            apiKey: NEXT_PUBLIC_FIREBASE_API_KEY ,  // Will be replaced during deployment
-            authDomain: "tingleword.firebaseapp.com",
-            projectId: "tingleword",
-            storageBucket: "tingleword.appspot.com",
-            messagingSenderId: "61299705070",
-            appId: "1:61299705070:web:8df158d56514b65fcedfff",
-            measurementId: "G-2HRBW93Q68"
-        };
+   // Fetch API key from the global script variable
+const firebaseConfig = {
+    apiKey: window.firebaseConfig.apiKey,  // ✅ Correct way to access it
+    authDomain: "tingleword.firebaseapp.com",
+    projectId: "tingleword",
+    storageBucket: "tingleword.appspot.com",
+    messagingSenderId: "61299705070",
+    appId: "1:61299705070:web:8df158d56514b65fcedfff",
+    measurementId: "G-2HRBW93Q68"
+};
+
     
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -64,6 +64,18 @@
             document.getElementById("loginBtn").classList.remove("hidden");
         });
     </script>
+    <script>
+        window.firebaseConfig = {
+          apiKey: "<%= NEXT_PUBLIC_FIREBASE_API_KEY %>", // Vercel replaces this during deployment
+          authDomain: "tingleword.firebaseapp.com",
+          projectId: "tingleword",
+          storageBucket: "tingleword.appspot.com",
+          messagingSenderId: "61299705070",
+          appId: "1:61299705070:web:8df158d56514b65fcedfff",
+          measurementId: "G-2HRBW93Q68"
+        };
+      </script>
+      
     
 </body>
 </html>    
