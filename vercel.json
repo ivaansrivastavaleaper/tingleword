@@ -1,0 +1,12 @@
+{
+    "rewrites": [
+      {
+        "source": "/index.html",
+        "destination": "/index.html",
+        "headers": {
+          "X-Replace-API-Key": "@NEXT_PUBLIC_FIREBASE_API_KEY"
+        }
+      }
+    ]
+  }
+  
