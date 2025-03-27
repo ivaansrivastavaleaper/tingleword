@@ -3,41 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TingleWord - Productivity Tools</title>
+    <title>TingleWord - Boost Productivity</title>
     <style>
-        :root {
-            --bg-color: #f4f4f9;
-            --text-color: #333;
-            --container-bg: white;
-            --button-bg: #4285F4;
-            --button-hover: #357ae8;
-            --account-bg: #ff4d4d;
-        }
-
-        body.dark-mode {
-            --bg-color: #1e1e1e;
-            --text-color: #ffffff;
-            --container-bg: #333;
-            --button-bg: #444;
-            --button-hover: #666;
-            --account-bg: #ff6666;
-        }
-
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
         }
-
         .container {
-            background: var(--container-bg);
+            background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -45,9 +25,14 @@
             width: 90%;
             max-width: 400px;
         }
-
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #666;
+        }
         button {
-            background-color: var(--button-bg);
+            background-color: #4285F4;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -57,63 +42,55 @@
             margin-top: 10px;
             transition: 0.3s;
         }
-        button:hover { background-color: var(--button-hover); }
-
-        #account-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: var(--account-bg);
+        button:hover {
+            background-color: #357ae8;
         }
-
-        #account-menu {
-            display: none;
-            position: absolute;
-            top: 50px;
-            right: 15px;
-            background: var(--container-bg);
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        #account-menu button {
-            display: block;
-            margin: 5px;
+        #user-info {
+            margin-top: 15px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <button id="account-btn">Account</button>
-
-    <div id="account-menu">
-        <button id="login-btn">Login</button>
-        <button id="logout-btn" style="display: none;">Logout</button>
-        <button id="dark-mode-toggle">Toggle Dark Mode</button>
-        <button id="delete-account-btn" style="display: none; background: red;">Delete Account</button>
-    </div>
-
     <div class="container">
         <h1>Welcome to TingleWord</h1>
-        <p id="status-text">Not logged in. Click "Account" to log in.</p>
+        <p>We help you boost productivity with smart tools.</p>
+        
+        <button id="login-btn">Login with Google</button>
+        <button id="logout-btn" style="display: none;">Logout</button>
+
+        <p id="user-info"></p>
     </div>
 
     <script type="module">
-        import { auth, provider, signInWithPopup, signOut, deleteUser, reauthenticateWithPopup } from '/firebase-config.js';
+        import { googleSignIn, googleSignOut } from "/firebase-config.js";
 
-        const accountBtn = document.getElementById("account-btn");
-        const accountMenu = document.getElementById("account-menu");
-        const loginBtn = document.getElementById("login-btn");
-        const logoutBtn = document.getElementById("logout-btn");
-        const deleteAccountBtn = document.getElementById("delete-account-btn");
-        const statusText = document.getElementById("status-text");
-        const darkModeToggle = document.getElementById("dark-mode-toggle");
+        document.getElementById("login-btn").addEventListener("click", googleSignIn);
+        document.getElementById("logout-btn").addEventListener("click", googleSignOut);
+    </script>
 
-        // Toggle Account Menu
-        accountBtn.addEventListener("click", (event) => {
-            event.stopPropagation();
-            accountMenu.style.display = (accountMenu.style.display === "block") ? "none" : "block";
+    <script type="module">
+        import { auth, provider, signInWithPopup } from '/firebase-config.js';
+
+        document.getElementById("login-btn").addEventListener("click", async () => {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                document.getElementById("user-info").innerText = `Hello, ${user.displayName}`;
+                document.getElementById("login-btn").style.display = "none";
+                document.getElementById("logout-btn").style.display = "block";
+            } catch (error) {
+                console.error("Login Failed:", error);
+            }
         });
 
-        document.addEventListener("click", (event) => {
+        document.getElementById("logout-btn").addEventListener("click", () => {
+            document.getElementById("user-info").innerText = "";
+            document.getElementById("login-btn").style.display = "block";
+            document.getElementById("logout-btn").style.display = "none";
+        });
+    </script>
+
+</body>
+</html>
