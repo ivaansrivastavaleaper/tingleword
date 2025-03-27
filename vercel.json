@@ -1,6 +1,0 @@
-{
-    "env": {
-      "NEXT_PUBLIC_FIREBASE_API_KEY": "@firebsae_api_key"
-    }
-  }
-  

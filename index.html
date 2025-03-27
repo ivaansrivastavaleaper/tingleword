@@ -26,33 +26,28 @@
     </div>
 
     <script type="module">
-       
-
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
-
-        // Fetch Firebase API Key from Vercel environment variables
+    
         const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,  // Use NEXT_PUBLIC_
-    authDomain: "tingleword.firebaseapp.com",
-    projectId: "tingleword",
-    storageBucket: "tingleword.appspot.com",
-    messagingSenderId: "61299705070",
-    appId: "1:61299705070:web:8df158d56514b65fcedfff",
-    measurementId: "G-2HRBW93Q68"
-};
-
-
-
+            apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY, // Loaded from Vercel
+            authDomain: "tingleword.firebaseapp.com",
+            projectId: "tingleword",
+            storageBucket: "tingleword.appspot.com",
+            messagingSenderId: "61299705070",
+            appId: "1:61299705070:web:8df158d56514b65fcedfff",
+            measurementId: "G-2HRBW93Q68"
+        };
+    
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
-
+    
         document.getElementById("loginBtn").addEventListener("click", async () => {
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
-
+    
                 document.getElementById("userInfo").classList.remove("hidden");
                 document.getElementById("userPic").src = user.photoURL;
                 document.getElementById("userName").innerText = `Hello, ${user.displayName}`;
@@ -61,19 +56,12 @@
                 console.error("Login failed:", error);
             }
         });
-
+    
         document.getElementById("logoutBtn").addEventListener("click", async () => {
             await signOut(auth);
             document.getElementById("userInfo").classList.add("hidden");
             document.getElementById("loginBtn").classList.remove("hidden");
         });
     </script>
-    <script>
-        window.env = {
-            FIREBASE_API_KEY: "<%= process.env.NEXT_PUBLIC_FIREBASE_API_KEY %>"
-        };
-    </script>
-    
-
 </body>
-</html>
+</html>    
