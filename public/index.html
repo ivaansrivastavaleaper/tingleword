@@ -3,21 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TingleWord - Note Manager</title>
+    <title>TingleWord - Productivity Tools</title>
     <style>
+        :root {
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --container-bg: white;
+            --button-bg: #4285F4;
+            --button-hover: #357ae8;
+            --account-bg: #ff4d4d;
+        }
+
+        body.dark-mode {
+            --bg-color: #1e1e1e;
+            --text-color: #ffffff;
+            --container-bg: #333;
+            --button-bg: #444;
+            --button-hover: #666;
+            --account-bg: #ff6666;
+        }
+
         body {
             font-family: Arial, sans-serif;
             text-align: center;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f4f4f9;
         }
+
         .container {
-            background: white;
+            background: var(--container-bg);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -25,10 +45,9 @@
             width: 90%;
             max-width: 400px;
         }
-        h1 { color: #333; }
-        p { color: #666; }
+
         button {
-            background-color: #4285F4;
+            background-color: var(--button-bg);
             color: white;
             border: none;
             padding: 10px 20px;
@@ -38,50 +57,34 @@
             margin-top: 10px;
             transition: 0.3s;
         }
-        button:hover { background-color: #357ae8; }
+        button:hover { background-color: var(--button-hover); }
+
         #account-btn {
             position: absolute;
             top: 15px;
             right: 15px;
-            background: #ff4d4d;
+            background: var(--account-bg);
         }
+
         #account-menu {
             display: none;
             position: absolute;
             top: 50px;
             right: 15px;
-            background: white;
+            background: var(--container-bg);
             padding: 10px;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
+
         #account-menu button {
             display: block;
             margin: 5px;
         }
-        #note-manager, #onboarding {
-            display: none;
-            text-align: left;
-            margin-top: 15px;
-        }
-        #confirm-popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            text-align: center;
-        }
-        #confirm-popup button {
-            margin: 10px;
-            background-color: red;
-        }
-        #cancel-delete {
-            background-color: gray;
+
+        /* Dark Mode Toggle */
+        #dark-mode-toggle {
+            background: #666;
         }
     </style>
 </head>
@@ -90,28 +93,15 @@
     <button id="account-btn">Account</button>
 
     <div id="account-menu">
-        <button id="login-btn">Login with Google</button>
+        <button id="login-btn">Login</button>
         <button id="logout-btn" style="display: none;">Logout</button>
+        <button id="dark-mode-toggle">Toggle Dark Mode</button>
         <button id="delete-account-btn" style="display: none; background: red;">Delete Account</button>
     </div>
 
     <div class="container">
         <h1>Welcome to TingleWord</h1>
-        <p id="welcome-text">Please log in to manage your notes.</p>
-        <p id="user-info"></p>
-
-        <div id="note-manager">
-            <h2>Note Manager</h2>
-            <textarea placeholder="Write your notes here..."></textarea>
-            <button>Save Note</button>
-        </div>
-    </div>
-
-    <!-- Confirm Delete Popup -->
-    <div id="confirm-popup">
-        <p>Are you sure you want to delete your account? This cannot be undone.</p>
-        <button id="confirm-delete">Yes, Delete</button>
-        <button id="cancel-delete">Cancel</button>
+        <p id="status-text">Not logged in. Click "Account" to log in.</p>
     </div>
 
     <script type="module">
@@ -122,34 +112,30 @@
         const loginBtn = document.getElementById("login-btn");
         const logoutBtn = document.getElementById("logout-btn");
         const deleteAccountBtn = document.getElementById("delete-account-btn");
-        const confirmPopup = document.getElementById("confirm-popup");
+        const statusText = document.getElementById("status-text");
+        const darkModeToggle = document.getElementById("dark-mode-toggle");
 
         // Toggle Account Menu
         accountBtn.addEventListener("click", (event) => {
-            event.stopPropagation(); // Prevents click from closing the menu immediately
+            event.stopPropagation();
             accountMenu.style.display = (accountMenu.style.display === "block") ? "none" : "block";
         });
 
-        // Close menu when clicking outside
         document.addEventListener("click", (event) => {
             if (!accountMenu.contains(event.target) && event.target !== accountBtn) {
                 accountMenu.style.display = "none";
             }
         });
 
-        // Login with Google
+        // Login
         loginBtn.addEventListener("click", async () => {
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
-
-                document.getElementById("user-info").innerText = `Hello, ${user.displayName}`;
+                statusText.innerText = `You're logged in as ${user.displayName}`;
                 loginBtn.style.display = "none";
                 logoutBtn.style.display = "block";
                 deleteAccountBtn.style.display = "block";
-                document.getElementById("welcome-text").style.display = "none";
-
-                checkUserExists(user.email);
             } catch (error) {
                 console.error("Login Failed:", error);
             }
@@ -158,27 +144,20 @@
         // Logout
         logoutBtn.addEventListener("click", () => {
             signOut(auth).then(() => {
-                document.getElementById("user-info").innerText = "";
+                statusText.innerText = "Not logged in. Click 'Account' to log in.";
                 loginBtn.style.display = "block";
                 logoutBtn.style.display = "none";
                 deleteAccountBtn.style.display = "none";
-                document.getElementById("welcome-text").style.display = "block";
-                document.getElementById("note-manager").style.display = "none";
             });
         });
 
         // Delete Account
-        deleteAccountBtn.addEventListener("click", () => {
-            confirmPopup.style.display = "block";
-        });
-
-        document.getElementById("cancel-delete").addEventListener("click", () => {
-            confirmPopup.style.display = "none";
-        });
-
-        document.getElementById("confirm-delete").addEventListener("click", async () => {
+        deleteAccountBtn.addEventListener("click", async () => {
             const user = auth.currentUser;
             if (!user) return;
+
+            const confirmDelete = confirm("Are you sure you want to delete your account?");
+            if (!confirmDelete) return;
 
             try {
                 await reauthenticateWithPopup(user, provider);
@@ -191,15 +170,15 @@
             }
         });
 
-        function checkUserExists(email) {
-            const existingUsers = JSON.parse(localStorage.getItem("users") || "{}");
+        // Dark Mode Toggle
+        darkModeToggle.addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+            localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
+        });
 
-            if (existingUsers[email]) {
-                document.getElementById("note-manager").style.display = "block";
-            } else {
-                localStorage.setItem("users", JSON.stringify({ ...existingUsers, [email]: true }));
-                document.getElementById("note-manager").style.display = "block";
-            }
+        // Load Dark Mode Preference
+        if (localStorage.getItem("darkMode") === "true") {
+            document.body.classList.add("dark-mode");
         }
     </script>
 
