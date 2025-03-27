@@ -6,11 +6,15 @@
     <title>Google Auth</title>
 </head>
 <body>
-    <button id="login-btn">Login with Google</button>
+    <script type="module" src="/firebase-config.js"></script>
+
+<button id="login-btn" onclick="googleSignIn()">Login with Google</button>
+<button id="logout-btn" onclick="googleSignOut()">Logout</button>
+
     <p id="user-info"></p>
 
     <script type="module">
-        import { auth, provider, signInWithPopup } from '../src/firebase-config.js';
+        import { auth, provider, signInWithPopup } from '/firebase-config.js';
 
         document.getElementById("login-btn").addEventListener("click", async () => {
             try {
