@@ -35,7 +35,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
    // Fetch API key from the global script variable
-const firebaseConfig = {
+   const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY, 
     authDomain: "tingleword.firebaseapp.com",
     projectId: "tingleword",
@@ -44,6 +44,10 @@ const firebaseConfig = {
     appId: "1:61299705070:web:8df158d56514b65fcedfff",
     measurementId: "G-2HRBW93Q68"
 };
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+    
 
     
         const app = initializeApp(firebaseConfig);
