@@ -25,12 +25,8 @@
             width: 90%;
             max-width: 400px;
         }
-        h1 {
-            color: #333;
-        }
-        p {
-            color: #666;
-        }
+        h1 { color: #333; }
+        p { color: #666; }
         button {
             background-color: #4285F4;
             color: white;
@@ -42,10 +38,24 @@
             margin-top: 10px;
             transition: 0.3s;
         }
-        button:hover {
-            background-color: #357ae8;
+        button:hover { background-color: #357ae8; }
+        #account-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff4d4d;
         }
-        #note-manager {
+        #account-menu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 15px;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        #note-manager, #onboarding {
             display: none;
             text-align: left;
             margin-top: 15px;
@@ -57,18 +67,48 @@
             padding: 5px;
             font-size: 14px;
         }
+        #confirm-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        #confirm-popup button {
+            margin: 10px;
+            background-color: red;
+        }
+        #cancel-delete {
+            background-color: gray;
+        }
     </style>
 </head>
 <body>
 
+    <button id="account-btn">Account</button>
+
+    <div id="account-menu">
+        <button id="login-btn">Login with Google</button>
+        <button id="logout-btn" style="display: none;">Logout</button>
+        <button id="delete-account-btn" style="display: none; background: red;">Delete Account</button>
+    </div>
+
     <div class="container">
         <h1>Welcome to TingleWord</h1>
         <p id="welcome-text">Please log in to manage your notes.</p>
-        
-        <button id="login-btn">Login with Google</button>
-        <button id="logout-btn" style="display: none;">Logout</button>
-
         <p id="user-info"></p>
+
+        <div id="onboarding">
+            <h2>Setup Your Account</h2>
+            <p>What do you want to use TingleWord for?</p>
+            <input type="text" id="user-purpose" placeholder="e.g. Task management, Notes">
+            <button id="complete-onboarding">Save</button>
+        </div>
 
         <div id="note-manager">
             <h2>Note Manager</h2>
@@ -77,39 +117,98 @@
         </div>
     </div>
 
-    <script type="module">
-        import { googleSignIn, googleSignOut } from "/firebase-config.js";
-        document.getElementById("login-btn").addEventListener("click", googleSignIn);
-        document.getElementById("logout-btn").addEventListener("click", googleSignOut);
-    </script>
+    <!-- Confirm Delete Popup -->
+    <div id="confirm-popup">
+        <p>Are you sure you want to delete your account? This cannot be undone.</p>
+        <button id="confirm-delete">Yes, Delete</button>
+        <button id="cancel-delete">Cancel</button>
+    </div>
 
     <script type="module">
-        import { auth, provider, signInWithPopup, signOut } from '/firebase-config.js';
+        import { auth, provider, signInWithPopup, signOut, deleteUser, reauthenticateWithPopup } from '/firebase-config.js';
 
-        document.getElementById("login-btn").addEventListener("click", async () => {
+        const loginBtn = document.getElementById("login-btn");
+        const logoutBtn = document.getElementById("logout-btn");
+        const deleteAccountBtn = document.getElementById("delete-account-btn");
+        const accountBtn = document.getElementById("account-btn");
+        const accountMenu = document.getElementById("account-menu");
+        const confirmPopup = document.getElementById("confirm-popup");
+
+        accountBtn.addEventListener("click", () => {
+            accountMenu.style.display = accountMenu.style.display === "block" ? "none" : "block";
+        });
+
+        loginBtn.addEventListener("click", async () => {
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
 
                 document.getElementById("user-info").innerText = `Hello, ${user.displayName}`;
-                document.getElementById("login-btn").style.display = "none";
-                document.getElementById("logout-btn").style.display = "block";
+                loginBtn.style.display = "none";
+                logoutBtn.style.display = "block";
+                deleteAccountBtn.style.display = "block";
                 document.getElementById("welcome-text").style.display = "none";
-                document.getElementById("note-manager").style.display = "block";
+
+                const userEmail = user.email;
+                checkUserExists(userEmail);
             } catch (error) {
                 console.error("Login Failed:", error);
             }
         });
 
-        document.getElementById("logout-btn").addEventListener("click", () => {
+        logoutBtn.addEventListener("click", () => {
             signOut(auth).then(() => {
                 document.getElementById("user-info").innerText = "";
-                document.getElementById("login-btn").style.display = "block";
-                document.getElementById("logout-btn").style.display = "none";
+                loginBtn.style.display = "block";
+                logoutBtn.style.display = "none";
+                deleteAccountBtn.style.display = "none";
                 document.getElementById("welcome-text").style.display = "block";
                 document.getElementById("note-manager").style.display = "none";
+                document.getElementById("onboarding").style.display = "none";
             });
         });
+
+        deleteAccountBtn.addEventListener("click", () => {
+            confirmPopup.style.display = "block";
+        });
+
+        document.getElementById("cancel-delete").addEventListener("click", () => {
+            confirmPopup.style.display = "none";
+        });
+
+        document.getElementById("confirm-delete").addEventListener("click", async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            try {
+                await reauthenticateWithPopup(user, provider);
+                await deleteUser(user);
+                alert("Your account has been deleted.");
+                localStorage.removeItem("users");
+                location.reload();
+            } catch (error) {
+                console.error("Error deleting account:", error);
+                alert("Account deletion failed. Please log in again before deleting.");
+            }
+        });
+
+        function checkUserExists(email) {
+            const existingUsers = JSON.parse(localStorage.getItem("users") || "{}");
+
+            if (existingUsers[email]) {
+                document.getElementById("note-manager").style.display = "block";
+            } else {
+                document.getElementById("onboarding").style.display = "block";
+                document.getElementById("complete-onboarding").addEventListener("click", () => {
+                    existingUsers[email] = {
+                        purpose: document.getElementById("user-purpose").value
+                    };
+                    localStorage.setItem("users", JSON.stringify(existingUsers));
+                    document.getElementById("onboarding").style.display = "none";
+                    document.getElementById("note-manager").style.display = "block";
+                });
+            }
+        }
     </script>
 
 </body>
