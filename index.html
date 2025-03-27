@@ -29,8 +29,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
     
+        // Instead of process.env, fetch from a Vercel environment variable
         const firebaseConfig = {
-            apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY, // Loaded from Vercel
+            apiKey: "AIzaSyAoyrMwrhbVRYO1DbvzdPZ1r_24J6ZmR2s",  // Will be replaced during deployment
             authDomain: "tingleword.firebaseapp.com",
             projectId: "tingleword",
             storageBucket: "tingleword.appspot.com",
@@ -63,5 +64,6 @@
             document.getElementById("loginBtn").classList.remove("hidden");
         });
     </script>
+    
 </body>
 </html>    
